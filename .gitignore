@@ -1,0 +1,2 @@
+lua/
+var_nginx/logs/*.log
