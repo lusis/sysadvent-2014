@@ -16,8 +16,16 @@ The following resources are available
 	<li><a href="/header_dump">header dump</a></li>
 	<li><a href="/github">location capture</a></li>
 	<li><a href="/shared_dict">shared dicts</a></li>
-	<li><a href="/auth">authentication</a></li>
+	<li><a href="/auth">authentication (look in init.lua for the username and password)</a></li>
 	<li><a href="/templates">templating</a></li>
+</ul>
+The following resources require you to restart the container with additional env vars passed in like so:
+<pre>
+DOCKER_ENV="--env SLACK_API_TOKEN=XXXXXXXXXXXXXXX" make run
+</pre>
+<ul>
+	<li><a href="/slack">slack websocket client in lua</a></li>
+	<li><a href="/wssredir">slack websocket proxy</a></li>
 </ul>
 </body>
 </html>

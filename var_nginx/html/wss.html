@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.1/css/bootstrap.min.css">
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.1/css/bootstrap-theme.min.css">
+<script src="//cdnjs.cloudflare.com/ajax/libs/underscore.js/1.7.0/underscore-min.js"></script>
+<script src="//maxcdn.bootstrapcdn.com/bootstrap/3.3.1/js/bootstrap.min.js"></script>
+<script>
+var ws = null;
+var connect_data = JSON.parse('{*params.data*}');
+var users = connect_data.users;
+var channels = connect_data.channels;
+var groups = connect_data.groups;
+
+if (!String.prototype.startsWith) {
+  Object.defineProperty(String.prototype, 'startsWith', {
+    enumerable: false,
+    configurable: false,
+    writable: false,
+    value: function(searchString, position) {
+      position = position || 0;
+      return this.lastIndexOf(searchString, position) === position;
+    }
+  });
+}
+
+function connect() {
+  if (ws !== null) return log('already connected');
+  ws = new WebSocket('{*params.url*}');
+  ws.onopen = function () {
+    log('connected');
+  };
+  ws.onerror = function (error) {
+    log(error);
+  };
+  ws.onmessage = function (e) {
+    log('recv: ' + e.data);
+    msg_data = JSON.parse(e.data);
+    if (msg_data.type === "message") {
+	    var chan;
+	    var username;
+	    console.log("Checking channel");
+            if (_.isUndefined(msg_data.channel)) {
+               chan = "undefined source!";
+            } else if (msg_data.channel.startsWith('G')) {
+		var g = _.findWhere(groups, {id: msg_data.channel});
+		chan = g.name;
+	    } else if (msg_data.channel.startsWith('C')) {
+		var c = _.findWhere(channels, {id: msg_data.channel});
+		chan = c.name;
+	    } else if (msg_data.channel.startsWith('D')) {
+		chan = "private message";
+	    } else {
+		chan = "unknown source!";
+	    }
+            if (_.isUndefined(msg_data.user))  {
+   		username = msg_data.username;
+            } else {
+	    	u = _.findWhere(users, {id: msg_data.user});
+		username = u.name;
+	    } 
+	    chat('['+chan+'] '+username+':  '+msg_data.text);
+    }
+  };
+  ws.onclose = function () {
+    log('disconnected');
+    ws = null;
+  };
+  return false;
+}
+function disconnect() {
+  if (ws === null) return log('already disconnected');
+  ws.close();
+  return false;
+}
+function send() {
+  if (ws === null) return log('please connect first');
+  var text = document.getElementById('text').value;
+  document.getElementById('text').value = "";
+  log('send: ' + text);
+  ws.send(text);
+  return false;
+}
+function pretendTyping(channel) {
+  if (ws === null) return log('please connect first');
+  text = {"id":1,"type":"typing","channel":channel}
+  log('send: ' + text);
+  ws.send(text);
+  return false;
+}
+
+function chat(text) {
+  var li = document.createElement('li');
+  li.appendChild(document.createTextNode(text));
+  document.getElementById('chat').appendChild(li);
+  return false;
+}
+
+function log(text) {
+  var ta = document.getElementById('log');
+  ta.appendChild(document.createTextNode(text+"\n"));
+  ta.scrollTop = ta.scrollHeight;
+  return false;
+}
+</script>
+
+<title>Welcome SysAdvent - Websocket Client</title>
+</head>
+<body onload="return connect();">
+  <div class="container">
+	  <form onsubmit="return send();">
+	    <!--
+	    <button type="button" onclick="return pretendTyping();">
+	     Pretend to type
+	    </button>
+	    -->
+	    <button type="button" onclick="return disconnect();">
+	      Disconnect
+	    </button>
+	    <!--
+	    <input id="text" type="text">
+	    <button type="submit">Send</button>
+	    -->
+	  </form>
+	  <div class="row">
+		  <label>Messages</label>
+		  <ol id="chat" style="width: 100%;"></ol>
+	  </div>
+	  <div class="row">
+		  <label>Raw log</label>
+		  <textarea id="log" rows="25" columns="180" disabled style="width:100%;"></textarea>
+	  </div>
+  </div>
+</body>
+</html>
