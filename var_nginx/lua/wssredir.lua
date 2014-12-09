@@ -8,6 +8,11 @@ local template = require 'resty.template'
 template.caching(false)
 local params = {}
 
+if not slack_token then
+  ngx.say("Gotta set a slack token")
+  ngx.exit(ngx.OK)
+end
+
 local function start_rtm()
   local res, err = hc:get('https://slack.com/api/rtm.start?token='..slack_token)
   if err then

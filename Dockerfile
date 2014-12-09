@@ -84,8 +84,7 @@ RUN curl -s http://luarocks.org/releases/luarocks-2.2.0.tar.gz | tar xvz -C /tmp
 
 RUN /usr/local/bin/luarocks install lua-resty-template && \
  /usr/local/bin/luarocks install httpclient && \
- /usr/local/bin/luarocks install inspect && \
- /usr/local/bin/luarocks install github 
+ /usr/local/bin/luarocks install inspect
 
 RUN useradd -r -d /var/nginx nginx && chown -R nginx:nginx /var/nginx/ /tmp/client_body_tmp /tmp/proxy_temp
 

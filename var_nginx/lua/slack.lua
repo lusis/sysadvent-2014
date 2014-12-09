@@ -7,6 +7,11 @@ local inspect = require 'inspect'
 local ws = require 'resty.websocket.client'
 local wsc, err = ws:new()
 
+if not slack_token then
+  ngx.say("Gotta set a slack token")
+  ngx.exit(ngx.OK)
+end
+
 local function start_ws(url)
   local ok, err = wsc:connect(url)
   if not ok then
