@@ -14,13 +14,19 @@ Note that the container, when started, mounts the `var_nginx` directory inside t
 ### Log files
 All log files will be written OUTSIDE of the container. The one of most interest is `var_nginx/logs/error.log`. This is where all lua logging goes.
 
-### Websocket examples
+## Websocket examples
 To perform the websocket examples, you'll need a slack token for API calls. Then you'll want to restart the container with:
 
 `DOCKER_ENV="--env SLACK_API_TOKEN=XXXXXXXXX" make run`
 
+There are two examples of websockets in the repo:
+- The first where nginx is acting as the websocket client for you and returning regular text
+- The second where your browser operates as the websocket client and nginx is the websocket server
+
+To use the second kind of example, you'll need a modern browser that has native websocket support.
+
 ### Etcd examples
-To perform the etcd example, you'll need to have an external etcd instance to talk to (no authentication is supported). The makefile offers support for running an etcd container.
+To perform the etcd example (which also uses websockets), you'll need to have an external etcd instance to talk to (no authentication is supported). The makefile offers support for running an etcd container.
 If you want to use run etcd via the makefile, You'll your system's ip address as nginx will contact etcd at that ip address. localhost will not work in this case:
 ```
 PUBLIC_IP="your local ip" make etcd
@@ -38,3 +44,4 @@ for i in `seq 10 30`;do curl -Ls -XPUT -d value="192.168.1.${i}:80${i}" http://e
 ```
 
 You should see the data start filling up the table in your browser as it is added.
+
