@@ -19,34 +19,35 @@ local content = [[
   <p>The following form will use this capture mechanism to query the github public api for the provided username. This will be non-blocking and results will be displayed in JSON format to your browser.</p>
 ]]
 -- if we don't have any params, we display a form
-local form = [[<hr/><p>Enter a username to find on github:</p> <form action="/github"><input type="text" name="username"><br/><input type="submit"></form>"]]
+local form = [[<hr/><p>Enter a username to find on github:</p> <form action="/github"><input type="text" name="username"><br/><input type="submit"></form>]]
+
+ngx.say(bootstrap_header)
+ngx.say(content)
+ngx.say(form)
+
 local username = ngx.var.arg_username
-if not username then
-  ngx.say(bootstrap_header)
-  ngx.say(content)
-  ngx.say(form)
-  ngx.say("</div>")
-  ngx.say(bootstrap_footer)
-  ngx.exit(ngx.OK)
+
+if username then
+  -- we call github because we've been asked to
+  -- We need to clear all the headers otherwise nginx will proxy our request headers through which we don't want here:
+  local bh = ngx.req.get_headers()
+    for k, v in pairs(bh) do
+      ngx.req.clear_header(k)
+  end
+
+  -- set our request headers. Github requires a user-agent
+  ngx.req.set_header("Content-Type", "application/json")
+  ngx.req.set_header("Accept", "application/json")
+  ngx.req.set_header("User-Agent", "sysadvent 2014 openresty ".. ngx.now())
+  -- ngx
+  local res = ngx.location.capture("/capture", { method = ngx.HTTP_GET, args = {url = "https://api.github.com/users/"..username}})
+  if not res then
+    ngx.say("<div class='alert alert-danger'>Something went goofy talking to github</div>")
+  else
+    ngx.say("<div class='github-response'><pre class='prettyprint'><code>"..res.body.."</code></pre></div>")
+  end
 end
 
--- We need to clear all the headers otherwise nginx will proxy our request headers through which we don't want here:
-local bh = ngx.req.get_headers()
-  for k, v in pairs(bh) do
-    ngx.req.clear_header(k)
-end
--- set our request headers. Github requires a user-agent
-ngx.req.set_header("Content-Type", "application/json")
-ngx.req.set_header("Accept", "application/json")
-ngx.req.set_header("User-Agent", "sysadvent 2014 openresty ".. ngx.now())
--- ngx
-local res = ngx.location.capture("/capture", { method = ngx.HTTP_GET, args = {url = "https://api.github.com/users/"..username}})
-if not res then
-  ngx.say("Something went goofy talking to github")
-  ngx.exit(ngx.OK)
-else
-  -- set our response header
-  ngx.header.content_type = "application/json"
-  ngx.say(res.body)
-  ngx.exit(ngx.OK)
-end
+ngx.say("</div>")
+ngx.say(bootstrap_footer)
+ngx.exit(ngx.OK)

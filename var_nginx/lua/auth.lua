@@ -41,6 +41,8 @@ if not user then
   ngx.status = ngx.HTTP_UNAUTHORIZED
   ngx.say('401 Access Denied')
 else
-  ngx.say("You got in!")
+  ngx.say(bootstrap_header)
+  ngx.say("<div class='alert alert-success' role='alert'>You authenticated as "..ngx.var.remote_user.."</div>")
+  ngx.say(bootstrap_footer)
   ngx.exit(ngx.OK)
 end
