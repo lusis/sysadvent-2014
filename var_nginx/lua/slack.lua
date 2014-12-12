@@ -6,6 +6,7 @@ local cjson = require 'cjson'
 local inspect = require 'inspect'
 local ws = require 'resty.websocket.client'
 local wsc, err = ws:new()
+local body
 
 if not slack_token then
   ngx.say("Gotta set a slack token")

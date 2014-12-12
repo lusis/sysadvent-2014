@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.1/css/bootstrap.min.css">
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.1/css/bootstrap-theme.min.css">
+<style>
+body {
+  padding-top: 50px;
+}
+.content {
+  padding: 40px 15px;
+}
+</style>
+<script src="//code.jquery.com/jquery-1.9.1.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.1/js/bootstrap.min.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/underscore.js/1.7.0/underscore-min.js"></script>
+<script src="//google-code-prettify.googlecode.com/svn/loader/run_prettify.js"></script>
+<script src="//google-code-prettify.googlecode.com/svn/trunk/src/lang-lua.js"></script>
+<script>
+var repl_url = window.location.protocol+"//"+window.location.hostname+":"+window.location.port+"/repl";
+function executeCommand() {
+	$("#command_results").empty();
+	var cmd = $('input#cmd').val();
+	console.log("Command: "+cmd);
+	if (cmd) {
+		$.ajax({
+		  type: "POST",
+		  url: repl_url,
+		  processData: false,
+		  data: "cmd="+cmd,
+		  success: function(res){ $("#command_results").append("<p><pre>"+res+"</pre></p>"); return false; },
+		  error: function(res){ $("#command_results").append('<p><div class="alert alert-warning" role="alert">Error thrown: '+res.responseText+'</div></p>'); return false; },
+		  });
+		  return false;
+		//$('#command_results').load(repl_url,{"cmd":cmd}, function(res, status, xhr) { $("#command_results").append("<pre>"+res+"</pre>") });
+	} else {
+		$("#command_results").append('<p><div class="alert alert-warning" role="alert">You must enter a command!</div></p>');
+		return false;
+	}
+}
+$("#cmd").keyup(function(event){
+    if(event.keyCode == 13){
+    	event.preventDefault();
+	$("#runit").click();
+	return false;
+    }
+});
+</script>
+<title>SysAdvent</title>
+</head>
+<body>
+    <nav class="navbar navbar-inverse navbar-fixed-top" role="navigation">
+      <div class="container">
+        <div class="navbar-header">
+          <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+            <span class="sr-only">Toggle navigation</span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+          <a class="navbar-brand" href="#">SysAdvent 2014</a>
+        </div>
+        <div id="navbar" class="collapse navbar-collapse">
+          <ul class="nav navbar-nav">
+            <li><a href="/">Home</a></li>
+            <li><a href="https://github.com/lusis/sysadvent-2014">Github Repo for this project</a></li>
+          </ul>
+        </div><!--/.nav-collapse -->
+      </div>
+    </nav>
+<div class="container">
+  <h1>Shoot the moon</h1>
+  <p>This page is going to give you a chance to shoot yourself in the foot. Sound like fun?</p>
+  <p>In the following form you can type in almost any of the <a href="http://wiki.nginx.org/HttpLuaModule">supported lua functions from this page</a> and have the results displayed back to you.</p>
+  <p>This is all 100% entirely unsafe but it's your container so that's a thing. Consider this like an openresty repl. It won't work for all the options but the worst that happens is you get an error or crash the container</p>
+  <div id="command_form">
+	  <input type="text" id="cmd" size=100></input>
+	  <p><button type="button" id="runit" onclick="return executeCommand();">Run it!</button>
+  </div>
+  <div id="command_results">
+  </div>
+</div>
+</body>
+</html>
