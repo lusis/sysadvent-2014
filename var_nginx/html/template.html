@@ -8,11 +8,15 @@
 <title>Welcome SysAdvent</title>
 </head>
 <body>
-This page is rendered using <a href="https://github.com/bungle/lua-resty-template">lua-resty-template</a>. This is not included with openresty but is installed using the lua package manager <a href="http://rocks.moonscript.org">luarocks</a>
-<br/>In this file: <pre>/var/nginx/html/template.html</pre> you can see the familiar handlebars style markup
+<div class="container">
+  <h1>Templating Example</h1>
+  <p/>This page is rendered using <a href="https://github.com/bungle/lua-resty-template">lua-resty-template</a>. This is not included with openresty but is installed using the lua package manager <a href="http://rocks.moonscript.org">luarocks</a>
+<p/>In this file: <pre>/var/nginx/html/template.html</pre> you can see the familiar handlebars style markup
+<h2>Some nginx data</h2>
 <ul>
-	<li>Current time (ngx.var.utctime): {[ngx.utctime()]}</li>
-	<li>Variable passed in from lua: {{message_string}}</li>
+  <li>Current time (ngx.var.utctime): <pre>{[ngx.utctime()]}</pre></li>
+  <li>Variable passed in from lua: <pre>{{message_string}}</pre></li>
 </ul>
+</div>
 </body>
 </html>

@@ -1,22 +1,32 @@
-local bootstrap = [[
-<!DOCTYPE html>
-<html>
-<head>
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.1/css/bootstrap.min.css">
-<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.1/css/bootstrap-theme.min.css">
-<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.1/js/bootstrap.min.js"></script>
-<title>Welcome SysAdvent</title>
-</head>
-<body>
+local content = [[
+  <div class="content">
+  <h1>ngx.location.capture</h1>
+
+  <p>Within each worker, care must be taken when using lua to perform only non-blocking operations to prevent blocking the worker's event loop so that it can process other connections.</p>
+  <p>Since we have access to lua, we could conceivably use a socket library to initiate network connections (such as talking to a backend service).</p>
+  <p>Doing this with standard socket calls would block the worker.
+  The basic way around this is to use the <i>ngx.location.capture</i> function in conjunction with an <i>internal</i> location in your nginx config:</p>
+  <pre>
+  location /call_backend {
+    internal;
+    resolver 8.8.8.8;
+    proxy_pass "http://mybackend:8080/getdata";
+  }
+  </pre>
+
+  An internal location is not exposed to outside network calls. It only exists as a location to the worker.
+  Calls made using location capture are non-blocking so that the worker can service other requests coming in.
+  <p>The following form will use this capture mechanism to query the github public api for the provided username. This will be non-blocking and results will be displayed in JSON format to your browser.</p>
 ]]
 -- if we don't have any params, we display a form
-local form = [[<form action="/github">Enter a username to find on github: <input type="text" name="username"><br/><input type="submit"></form>"]]
+local form = [[<hr/><p>Enter a username to find on github:</p> <form action="/github"><input type="text" name="username"><br/><input type="submit"></form>"]]
 local username = ngx.var.arg_username
 if not username then
-  ngx.say(bootstrap)
+  ngx.say(bootstrap_header)
+  ngx.say(content)
   ngx.say(form)
-  ngx.say("</body></html>")
+  ngx.say("</div>")
+  ngx.say(bootstrap_footer)
   ngx.exit(ngx.OK)
 end
 

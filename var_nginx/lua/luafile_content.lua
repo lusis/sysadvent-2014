@@ -1,20 +1,19 @@
-local bootstrap = [[
-<!DOCTYPE html>
-<html>
-<head>
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.1/css/bootstrap.min.css">
-<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.1/css/bootstrap-theme.min.css">
-<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.1/js/bootstrap.min.js"></script>
-<title>Welcome SysAdvent</title>
-</head>
-<body>
-]]
 local info = debug.getinfo(1,'S');
-local username = ngx.var.arg_username or "Anonymous"
-ngx.say(bootstrap)
-ngx.say("<p/>Hello, ", username, ". Welcome to openresty. This content comes from:")
-ngx.say("<p>", info.source)
-ngx.say("<p/>Maybe you wanted to log in as a user? <a href=/content_by_lua_file/?username=sysadvent>Click here!</a>")
-ngx.say("</body></html>")
+local content = [[
+<p>While the <i>content_by_lua</i> is good for simple cases, it falls apart quickly due to the required amount of escaping for real content.</p>
+<p>Moving the content out into an external lua file is much easier and starts to open the door for greater flexibility. This is where <i>content_by_lua_file</i> comes in:
+<pre>
+location /foo {
+  content_by_lua_file '/var/nginx/lua/somefile.lua';
+}
+</pre>
+From this point on, all content will come from a <i>content_by_lua_file</i> directive, static html or templates.
+]]
+ngx.say(bootstrap_header)
+ngx.say("<div class='content'>")
+ngx.say("<p>This content comes from:")
+ngx.say("<pre>", info.source)
+ngx.say("</pre></p>")
+ngx.say(content)
+ngx.say("</div>")
 ngx.exit(ngx.OK)

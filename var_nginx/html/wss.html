@@ -109,17 +109,22 @@ function log(text) {
 </head>
 <body onload="return connect();">
   <div class="container">
-	  <form onsubmit="return send();">
-	    <button type="button" onclick="return disconnect();">
-	      Disconnect
-	    </button>
-	  </form>
+    <h1>This is a ghetto slack websocket client</h1>
+    <hr/>
+    <div class="buttons">
+      <form>
+        <button type="button" onclick="return disconnect();">
+          Disconnect
+        </button>
+      </form>
+    </div>
 	  <div class="row">
 		  <label>Messages</label>
 		  <ol id="chat" style="width: 100%;"></ol>
 	  </div>
 	  <div class="row">
 		  <label>Raw log</label>
+      <p/>This is the raw log of websocket communications with the Slack RealTime API
 		  <textarea id="log" rows="25" columns="180" disabled style="width:100%;"></textarea>
 	  </div>
   </div>
