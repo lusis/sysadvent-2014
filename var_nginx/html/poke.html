@@ -29,8 +29,8 @@ function executeCommand() {
 		  url: repl_url,
 		  processData: false,
 		  data: "cmd="+cmd,
-		  success: function(res){ $("#command_results").append("<p><pre>"+res+"</pre></p>"); return false; },
-		  error: function(res){ $("#command_results").append('<p><div class="alert alert-warning" role="alert">Error thrown: '+res.responseText+'</div></p>'); return false; },
+		  success: function(res){ $("#command_results").append("<p><pre class='alert alert-success'>"+res+"</pre></p>"); return false; },
+		  error: function(res){ $("#command_results").append('<p><pre class="alert alert-danger">Error thrown: '+res.responseText+'</pre></p>'); return false; },
 		  });
 		  return false;
 		//$('#command_results').load(repl_url,{"cmd":cmd}, function(res, status, xhr) { $("#command_results").append("<pre>"+res+"</pre>") });
@@ -82,17 +82,18 @@ $("#cmd").keyup(function(event){
   </ul>
   <label>Examples</label>
   <select onChange="$('textarea#cmd').val(this.options[this.selectedIndex].value)">
-    <option value="return ngx.utctime()">ngx.utctime()</option>
-    <option value="return ngx.cookie_time(ngx.now())">ngx.cookie_time()</option>
-    <option value="url = 'http://httpbin.org/get'&#13;&#10;t = {args = {url = url}}&#13;&#10;res=ngx.location.capture('/capture',t)&#13;&#10;return inspect(res)">ngx.location.capture()</option>
-    <option value="return inspect(ngx.req.get_headers())">ngx.req.get_headers()</option>
+    <option value="return ngx.utctime()">ngx.utctime</option>
+    <option value="return ngx.cookie_time(ngx.now())">ngx.cookie_time</option>
+    <option value="url = 'http://httpbin.org/get'&#13;&#10;t = {args = {url = url}}&#13;&#10;res=ngx.location.capture('/capture',t)&#13;&#10;return inspect(res)">ngx.location.capture</option>
+    <option value='somejson = [[{"foo": "bar", "baz": "qux"}]]&#13;&#10;return inspect(cjson.decode(somejson))'>json decoding</option>
+    <option value="return inspect(ngx.req.get_headers())">ngx.req.get_headers</option>
   </select>
-  <div id="command_form">
-    <textarea id="cmd" rows=10 style="width: 100%;"></textarea>
-    <!--<input type="text" id="cmd" size=100></input>-->
-	  <p><button type="button" id="runit" onclick="return executeCommand();">Run it!</button>
-  </div>
-  <div id="command_results">
+  <div class="row">
+	  <div id="command_form">
+	    <textarea id="cmd" rows=10 style="width: 100%;"></textarea>
+	    <p><button type="button" id="runit" onclick="return executeCommand();">Run it!</button>
+	  </div>
+	  <div id="command_results" style="width: 100%;"></div>
   </div>
 </div>
 </body>
