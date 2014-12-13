@@ -21,7 +21,7 @@ body {
 var repl_url = window.location.protocol+"//"+window.location.hostname+":"+window.location.port+"/repl";
 function executeCommand() {
 	$("#command_results").empty();
-	var cmd = $('input#cmd').val();
+	var cmd = $('textarea#cmd').val();
 	console.log("Command: "+cmd);
 	if (cmd) {
 		$.ajax({
@@ -74,8 +74,22 @@ $("#cmd").keyup(function(event){
   <p>This page is going to give you a chance to shoot yourself in the foot. Sound like fun?</p>
   <p>In the following form you can type in almost any of the <a href="http://wiki.nginx.org/HttpLuaModule">supported lua functions from this page</a> and have the results displayed back to you.</p>
   <p>This is all 100% entirely unsafe but it's your container so that's a thing. Consider this like an openresty repl. It won't work for all the options but the worst that happens is you get an error or crash the container</p>
+  <p>The code <b>DOES</b> run in a smallish sandbox. You should always "return" the result you want as the last line. Additionally, you have access to the following modules</p>
+  <ul>
+    <li>cjson</li>
+    <li>ngx</li>
+    <li>inspect</li>
+  </ul>
+  <label>Examples</label>
+  <select onChange="$('textarea#cmd').val(this.options[this.selectedIndex].value)">
+    <option value="return ngx.utctime()">ngx.utctime()</option>
+    <option value="return ngx.cookie_time(ngx.now())">ngx.cookie_time()</option>
+    <option value="url = 'http://httpbin.org/get'&#13;&#10;t = {args = {url = url}}&#13;&#10;res=ngx.location.capture('/capture',t)&#13;&#10;return inspect(res)">ngx.location.capture()</option>
+    <option value="return inspect(ngx.req.get_headers())">ngx.req.get_headers()</option>
+  </select>
   <div id="command_form">
-	  <input type="text" id="cmd" size=100></input>
+    <textarea id="cmd" rows=10 style="width: 100%;"></textarea>
+    <!--<input type="text" id="cmd" size=100></input>-->
 	  <p><button type="button" id="runit" onclick="return executeCommand();">Run it!</button>
   </div>
   <div id="command_results">
