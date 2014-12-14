@@ -15,18 +15,29 @@ The C10K problem isn't really a "problem" anymore in the sense that is was origi
 Nginx addressed this largely with an event loop (I know some folks think the event loop was invented in 2009). The dominant webserver at the time (and still), Apache, used a model of spawning a new process or a new thread for each connection. Nginx did it differently in that it spawned a master process (handles configuration, launching worker threads and the like) and a pool of workers each with their own event loop. Workers share no state between each other and select from a shared socket to process requests. This particular model works and scales very well. There's more on the history of Nginx in its section in the second edition of [AOSA](http://www.aosabook.org/en/nginx.html). It's a good read and while not 100% current, the basics are unchanged.
 
 # Lua
-Lua is a programming language invented in 1993. The title of this article is a shout out to how underappreciated lua is not only as a language but in its myriad uses. Most people who have heard of Lua know it as the language used for World of Warcraft plugins.
+Lua is a programming language invented in 1993. The title of this article is a shout out to how underappreciated Lua is not only as a language but in its myriad uses. Most people who have heard of Lua know it as the language used for World of Warcraft plugins.
 
-Lua is an interesting language. Anyone with experience in Ruby will likely find themselves picking it up very quickly. It has a very small core language, first-class functions and coroutines. It is dynamically typed and has one native data structure - the table. When you work in Lua, you will learn to love and appreciate the power of tables. They feel a lot like a ruby hash and are the foundation of most advanced Lua. It has no classes but they can be implemented after a fashion using tables. Since lua has first-class functions, you can create a "class" by lumping data and function into a table. There's no inheritence but instead you have prototypes. There's a bit of syntatic sugar to help you out when working with these objects. Inheritence is handled via the metatable.
+Lua is an interesting language. Anyone with experience in Ruby will likely find themselves picking it up very quickly. It has a very small core language, first-class functions and coroutines. It is dynamically typed and has one native data structure - the table. When you work in Lua, you will learn to love and appreciate the power of tables. They feel a lot like a ruby hash and are the foundation of most advanced Lua. 
+
+It has no classes but they can be implemented after a fashion using tables. Since Lua has first-class functions, you can create a "class" by lumping data and function into a table. There's no inheritence but instead you have prototypes. There's a bit of syntatic sugar to help you out when working with these objects. Inheritence is handled via the metatable.
 
 For a good read on the language history
-- [wikipedia](http://en.wikipedia.org/wiki/Lua_(programming_language))
-- [lua website](http://www.lua.org/history.html)
+- [Wikipedia](http://en.wikipedia.org/wiki/Lua_(programming_language))
+- [Lua website](http://www.lua.org/history.html)
 
 For some basics on the language itself, the wikipedia article has code sample and also the [official documentation](http://www.lua.org/manual/5.2/). There is also a section on Lua in the newest edition of the Seven Languages series - [Seven More Languages in Seven Weeks](https://pragprog.com/book/7lang/seven-more-languages-in-seven-weeks)
 
 # Combining the two
-As I mentioned, lua is an easily embeddable language. I've been unable to find a date on when lua support was added to Nginx but it was a very early version. One of the pain point of Nginx is that it doesn't support dynamically loaded modules. All extended functionality outside the core must be compiled in. Lua support in nginx made it so that you could add some advanced functionality to nginx via Lua that would normally require a C module and a recompile. Much of the nginx api itself is exposed to lua directly and Lua can be used at multiple places in the Nginx workflow. For instance, you can modify request or response headers via lua. You can create rewrite rules via lua. You can create content itself via lua. All of these are [documented](http://wiki.nginx.org/HttpLuaModule#Nginx_API_for_Lua) on the nginx website. For example, if I wanted to have the response body be entirely created by lua, I could do the following in nginx:
+As I mentioned, Lua is an easily embeddable language. I've been unable to find a date on when Lua support was added to Nginx but it was a very early version.
+
+One of the pain points of Nginx is that it doesn't support dynamically loaded modules. All extended functionality outside the core must be compiled in. Lua support in nginx made it so that you could add some advanced functionality to nginx via Lua that would normally require a C module and a recompile. Much of the nginx api itself is exposed to lua directly and Lua can be used at multiple places in the Nginx workflow. You can:
+
+- modify request or response headers via Lua
+- create rewrite rules via Lua.
+- create content itself via Lua. 
+
+All of these are [documented](http://wiki.nginx.org/HttpLuaModule#Nginx_API_for_Lua) on the nginx website. 
+For example, if I wanted to have the response body be entirely created by lua, I could do the following in nginx:
 
 ```
       location /foo {
