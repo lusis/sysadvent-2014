@@ -5,7 +5,7 @@
 - `make all`
 - goto [http://127.0.0.1:3131/](http://127.0.0.1:3131)
 
-This will start openresty in the foreground and clean up after itself.
+This will start openresty in the foreground and clean up after itself. I've tested it mainly on Chrome + Linux. Specifically for the websocket stuff, Chrome is probably your best bet.
 
 ### boot2docker users
 I don't run boot2docker but my coworkers DID test this out on OSX boot2docker and claimed it worked. For windows users, I would love to have feedback.
