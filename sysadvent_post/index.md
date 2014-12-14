@@ -55,7 +55,7 @@ Obviously escaping could get to be a headache here so most of the `*_by_lua` dir
 
 Some other neat tricks you have available are using the cosocket api where you can actually open arbitrary non-blocking network connections from lua inside an Nginx worker.
 
-As you can see, this is pretty powerful. Additionally the Lua functionality is provided in nginx via a project called [LuaJIT](http://luajit.org/luajit.html) which offers amazing speed and predicatable performance. By default, lua code is cached in nginx but this can be disabled at run-time to help speed up the development process.
+As you can see, this is pretty powerful. Additionally the Lua functionality is provided in nginx via a project called [LuaJIT](http://luajit.org/luajit.html) which offers amazing speed and predicatable usage. By default, lua code is cached in nginx but this can be disabled at run-time to help speed up the development process.
 
 # Enter the openresty
 If it wasn't clear yet, the combination of nginx and lua basically gives you an application server right in the nginx core. Others have created lua modules specifically for use within Nginx and a few years ago an enterprising soul started bundling them up into something called [OpenResty](http://openresty.org/#About).
