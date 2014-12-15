@@ -25,7 +25,6 @@ function connect() {
         _.each(j, function(value, key) {
           log(key+" = "+value);
           updateTable(key, value);
-          //tableData.push([key, value]);
         })
         return false;
       }
@@ -51,12 +50,20 @@ function send() {
 function updateTable(k,v) {
   // Check if there's an existing row
   var tdid = k.split('/').slice(-1).pop()
-  console.log(k.split('/'));
-  if ($('td#'+tdid).length > 0) {
+  if ($('tr#'+tdid).length > 0) {
     console.log("Updating existing row: "+k);
-    $('td#'+tdid).text(v);
+    if ($("#current_"+tdid).length > 0) {
+      console.log("This is the active backend: "+tdid)
+      $('tr#'+tdid).addClass('success');
+    }
+    $('td#'+tdid+"_name").text(k);
+    $('td#'+tdid+"_address").text(v);
   } else {
-    $('#loadbalancers').append("<tr><td id="+tdid+">"+k+"</td><td>"+v+"</td></tr>");
+    if ($("#current_"+tdid).length > 0) {
+      $('#loadbalancers').append("<tr id="+tdid+" class='success'><td id="+tdid+"_name>"+k+"</td><td id="+tdid+"_address>"+v+"</td></tr>");
+    } else {
+      $('#loadbalancers').append("<tr id="+tdid+"><td id="+tdid+"_name>"+k+"</td><td id="+tdid+"_address>"+v+"</td></tr>");
+    }
   }
 }
 

@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.1/css/bootstrap.min.css">
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.1/css/bootstrap-theme.min.css">
+<style>
+body {
+  padding-top: 50px;
+}
+.content {
+  padding: 40px 15px;
+}
+label {
+  padding: 5px;
+}
+</style>
+<script src="//code.jquery.com/jquery-1.9.1.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.1/js/bootstrap.min.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/underscore.js/1.7.0/underscore-min.js"></script>
+<script src="//google-code-prettify.googlecode.com/svn/loader/run_prettify.js"></script>
+<script src="//google-code-prettify.googlecode.com/svn/trunk/src/lang-lua.js"></script>
+<script src='/js/lb.js'></script>
+<title>Welcome SysAdvent</title>
+</head>
+<body onload='return connect();'>
+
+    <nav class="navbar navbar-inverse navbar-fixed-top" role="navigation">
+      <div class="container">
+        <div class="navbar-header">
+          <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+            <span class="sr-only">Toggle navigation</span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+          <a class="navbar-brand" href="#">SysAdvent 2014</a>
+        </div>
+        <div id="navbar" class="collapse navbar-collapse">
+          <ul class="nav navbar-nav">
+            <li><a href="/">Home</a></li>
+            <li><a href="https://github.com/lusis/sysadvent-2014">Github Repo for this project</a></li>
+          </ul>
+        </div><!--/.nav-collapse -->
+      </div>
+    </nav>
+
+    <div class="container">
+        <h1>Dynamic nginx backends with etcd</h1>
+        <div id="current_node{{node_number}}">
+          <p>This is an example of dynamically choosing an nginx proxy_pass backend from lua. You are currently connected to node {{node_number}}. This node is highlighted in green from the current list of all nodes to indicate. Additionally, you can see that you have a customer header called <i>x-ngx-be</i> that was set.</p>
+          <p>The list of available nodes is stored in etcd. In the background, nginx is <a href="https://coreos.com/docs/distributed-configuration/etcd-api/">watching etcd via the watch interface</a> (search for 'waiting for a change').</p>
+          <p>As nodes populate the keyspace, an nginx shared dictionary is updated so that the current state is visible to all workers. The location block in nginx uses <i>set_by_lua</i> to select a random available backend and proxy your connection to it:
+          <pre>
+          location /load_balancer {
+            set_by_lua $backend_node '
+              local backends = ngx.shared.ng_loadbalancers
+              local candidates = backends:get_keys()
+              return backends:get(candidates[math.random(#candidates)])
+            ';
+            proxy_buffering off;
+            proxy_max_temp_file_size 0;
+            resolver 8.8.8.8;
+            proxy_pass http://$backend_node;
+          }
+          </pre>
+          </p>
+          <p>The table below is updated in real time via websockets calling the <i>/lbws</i> location.</p>
+        </div>
+        <div class="lbtable">
+        <table id='loadbalancers' class='table'>
+          <thead>
+            <tr>
+              <th>backend</th>
+              <th>address</th>
+            </tr>
+          </thead>
+        </table>
+      </div>
+    </div>
+  </body>
+</html>
