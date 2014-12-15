@@ -9,52 +9,53 @@ local wsc, err = ws:new()
 local body
 
 if not slack_token then
-  ngx.say("Gotta set a slack token")
+  ngx.say("data: Gotta set a slack token\n\n")
   ngx.exit(ngx.OK)
 end
 
 local function start_ws(url)
   local ok, err = wsc:connect(url)
+  ngx.header.content_type = 'text/event-stream'
   if not ok then
-    ngx.say("failed to connect: "..err)
-    return ngx.exit(444)
+    ngx.say("data: [failed to connect] "..err.."\n\n")
+    return ngx.exit(ngx.HTTP_OK)
   end
 
   while true do
     local data, typ, err = wsc:recv_frame()
     if wsc.fatal then
-      ngx.say("<br/>failed to recieve the frame: ", err)
+      ngx.say("data: [failed to recieve the frame] ", err,"\n\n")
       ngx.flush()
-      return ngx.exit(444)
+      return ngx.exit(ngx.HTTP_OK)
     end
     if not data then
-      ngx.say("<br/>sending ping: ", typ)
+      ngx.say("data: [sending ping] ", typ)
       local bytes, err = wsc:send_ping()
       if not bytes then
-        ngx.say("<br/>failed to send ping: ", err)
-        return ngx.exit(444)
+        ngx.say("data: [failed to send ping] ", err,"\n\n")
+        return ngx.exit(ngx.HTTP_OK)
       end
     elseif typ == "close" then break
     elseif typ == "ping" then
-      ngx.say("<br/>got ping: ", typ, "("..data..")")
+      ngx.say("data: [got ping] ", typ, "("..data..")\n\n")
       local bytes, err = wsc:send_pong()
       if not bytes then
-        ngx.say("<br/>failed to send pong: ", err)
-        return ngx.exit(444)
+        ngx.say("data: [failed to send pong] ", err,"\n\n")
+        return ngx.exit(ngx.HTTP_OK)
       end
     elseif typ == "text" then
       local ok, data_j = pcall(cjson.decode, data)
       if ok then
         if data_j['type'] == 'message' then
-          ngx.say("[",data_j.channel,"] ", data_j.user,":", data_j.text, "<br/>")
+          ngx.say("data: [",data_j.channel,"] ", data_j.user," ", data_j.text,"\n\n")
         elseif data_j['type'] == 'hello' then
-          ngx.say("Connected!<br/>")
+          ngx.say("data: Connected!\n\n")
         else
-          ngx.say("<br/>unknown type: ", data)
+          ngx.say("data: [unknown type] ", data, "\n\n")
         end
       end
     end
-    ngx.flush()
+    ngx.flush(true)
   end
 end
 

@@ -30,12 +30,9 @@ label {
   padding: 5px;
 }
 </style>
-<link rel="styelsheet" href="//cdn.datatables.net/plug-ins/9dcbecd42ad/integration/bootstrap/3/dataTables.bootstrap.css">
 <script src="//code.jquery.com/jquery-1.9.1.js"></script>
 <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.1/js/bootstrap.min.js"></script>
 <script src="//cdnjs.cloudflare.com/ajax/libs/underscore.js/1.7.0/underscore-min.js"></script>
-<script src="//cdn.datatables.net/1.10.4/js/jquery.dataTables.min.js"></script>
-<script src="//cdn.datatables.net/plug-ins/9dcbecd42ad/integration/bootstrap/3/dataTables.bootstrap.js"></script>
 <script src="//google-code-prettify.googlecode.com/svn/loader/run_prettify.js"></script>
 <script src="//google-code-prettify.googlecode.com/svn/trunk/src/lang-lua.js"></script>
 <title>Welcome SysAdvent</title>

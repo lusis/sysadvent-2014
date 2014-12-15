@@ -12,12 +12,9 @@ body {
   padding: 40px 15px;
 }
 </style>
-<link rel="styelsheet" href="//cdn.datatables.net/plug-ins/9dcbecd42ad/integration/bootstrap/3/dataTables.bootstrap.css">
 <script src="//code.jquery.com/jquery-1.9.1.js"></script>
-<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.1/js/bootstrap.min.js"></script>
+<script src="//maxcdn.bootstrapcdn.com/bootstrap/3.3.1/js/bootstrap.min.js"></script>
 <script src="//cdnjs.cloudflare.com/ajax/libs/underscore.js/1.7.0/underscore-min.js"></script>
-<script src="//cdn.datatables.net/1.10.4/js/jquery.dataTables.min.js"></script>
-<script src="//cdn.datatables.net/plug-ins/9dcbecd42ad/integration/bootstrap/3/dataTables.bootstrap.js"></script>
 <script src="//google-code-prettify.googlecode.com/svn/loader/run_prettify.js"></script>
 <script src="//google-code-prettify.googlecode.com/svn/trunk/src/lang-lua.js"></script>
 <script>
@@ -54,7 +51,6 @@ function connect() {
     if (msg_data.type === "message") {
 	    var chan;
 	    var username;
-	    console.log("Checking channel");
             if (_.isUndefined(msg_data.channel)) {
                chan = "undefined source!";
             } else if (msg_data.channel.startsWith('G')) {
@@ -105,9 +101,7 @@ function pretendTyping(channel) {
 }
 
 function chat(text) {
-  var li = document.createElement('li');
-  li.appendChild(document.createTextNode(text));
-  document.getElementById('chat').appendChild(li);
+  $('#chat').append("<p>"+text+"</p>")
   return false;
 }
 
@@ -144,7 +138,7 @@ function log(text) {
   <div class="container">
     <h1>This is a ghetto slack websocket client</h1>
     <p>In this example, your browser is the websocket client and nginx is the websocket server except that the websocket content is coming from slack's RTM websocket API</p>
-    <p>Since the slack api requires authentication before providing you a websocket url, this is done via lua before rendering this page at which point nginx actually does the proxying</p>
+    <p>Since the slack api requires authentication before providing you a websocket url, this is done via lua before rendering this page at which point nginx takes over as the proxy</p>
     <hr/>
     <div class="buttons">
       <form>
@@ -153,15 +147,15 @@ function log(text) {
         </button>
       </form>
     </div>
-	  <div class="row">
-		  <label>Messages</label>
-		  <ol id="chat" style="width: 100%;"></ol>
-	  </div>
-	  <div class="row">
-		  <label>Raw log</label>
-      <p/>This is the raw log of websocket communications with the Slack RealTime API
-		  <textarea id="log" rows="25" columns="180" disabled style="width:100%;"></textarea>
-	  </div>
+    <div class="row">
+	  <label>Messages</label>
+	  <div id="chat" style="width: 100%;"></div>
+    </div>
+    <div class="row">
+	  <label>Raw log</label>
+      	  <p/>This is the raw log of websocket communications with the Slack RealTime API
+	  <textarea id="log" rows="25" columns="180" disabled style="width:100%;"></textarea>
+    </div>
   </div>
 </body>
 </html>

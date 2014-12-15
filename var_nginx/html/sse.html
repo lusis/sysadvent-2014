@@ -12,17 +12,44 @@ body {
   padding: 40px 15px;
 }
 </style>
-<link rel="styelsheet" href="//cdn.datatables.net/plug-ins/9dcbecd42ad/integration/bootstrap/3/dataTables.bootstrap.css">
 <script src="//code.jquery.com/jquery-1.9.1.js"></script>
-<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.1/js/bootstrap.min.js"></script>
+<script src="//maxcdn.bootstrapcdn.com/bootstrap/3.3.1/js/bootstrap.min.js"></script>
 <script src="//cdnjs.cloudflare.com/ajax/libs/underscore.js/1.7.0/underscore-min.js"></script>
-<script src="//cdn.datatables.net/1.10.4/js/jquery.dataTables.min.js"></script>
-<script src="//cdn.datatables.net/plug-ins/9dcbecd42ad/integration/bootstrap/3/dataTables.bootstrap.js"></script>
 <script src="//google-code-prettify.googlecode.com/svn/loader/run_prettify.js"></script>
 <script src="//google-code-prettify.googlecode.com/svn/trunk/src/lang-lua.js"></script>
-<title>Welcome SysAdvent</title>
+
+<script>
+var sse_url = window.location.protocol+"//"+window.location.hostname+":"+window.location.port+"/slack";
+if (!String.prototype.startsWith) {
+  Object.defineProperty(String.prototype, 'startsWith', {
+    enumerable: false,
+    configurable: false,
+    writable: false,
+    value: function(searchString, position) {
+      position = position || 0;
+      return this.lastIndexOf(searchString, position) === position;
+    }
+  });
+}
+
+function connect() {
+  var evtSource = new EventSource(sse_url);
+  evtSource.onmessage = function(e) {
+    log(e.data);
+  }
+  return false;
+}
+
+function log(text) {
+  var ta = document.getElementById('log');
+  ta.appendChild(document.createTextNode(text+"\n"));
+  ta.scrollTop = ta.scrollHeight;
+  return false;
+}
+</script>
+<title>Welcome SysAdvent - SSE Client</title>
 </head>
-<body>
+<body onload="return connect();">
     <nav class="navbar navbar-inverse navbar-fixed-top" role="navigation">
       <div class="container">
         <div class="navbar-header">
@@ -42,35 +69,15 @@ body {
         </div><!--/.nav-collapse -->
       </div>
     </nav>
-<div class="container">
-  <div class="content">
-  <h1>Welcome sysadvent users!</h1>
-  <p class="lead">The following resources are available</p>
-<ul>
-	<li><a href="/content_by_lua">content_by_lua example</a></li>
-	<li><a href="/content_by_lua_file">content_by_lua_file example</a></li>
-	<li><a href="/header_dump">header dump</a></li>
-	<li><a href="/github">location capture</a></li>
-	<li><a href="/shared_dict">shared dicts</a></li>
-	<li><a href="/auth">authentication (look in init.lua for the username and password)</a></li>
-	<li><a href="/templates">templating</a></li>
-	<li><a href="/poke.html">ghetto repl</a></li>
-</ul>
-The following resources require you to restart the container with additional env vars passed in like so:
-<pre>
-DOCKER_ENV="--env SLACK_API_TOKEN=XXXXXXXXXXXXXXX" make run
-</pre>
-<ul>
-	<li><a href="/sse.html">slack websocket client in lua with server-sent events</a></li>
-	<li><a href="/wssredir">slack websocket proxy</a></li>
-</ul>
-<pre>
-DOCKER_ENV="--env ETCD_URL="http://etcd_host:4001" make run
-</pre>
-<ul>
-	<li><a href="/load_balancer">data from etcd watch</a></li>
-</ul>
-</div>
-</div>
+  <div class="container">
+    <h1>This is a ghetto slack SSE client</h1>
+    <p>In this example, nginx is the websocket client. It is converting any messages it gets to <a href="https://developer.mozilla.org/en-US/docs/Server-sent_events/Using_server-sent_events">server-sent events</a></p>
+    <hr/>
+    <div class="row">
+	  <label>Raw log</label>
+      	  <p/>This is the raw log of websocket communications with the Slack RealTime API
+	  <textarea id="log" rows="25" columns="180" disabled style="width:100%;"></textarea>
+    </div>
+  </div>
 </body>
 </html>

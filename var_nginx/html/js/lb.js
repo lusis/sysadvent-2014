@@ -18,14 +18,18 @@ function connect() {
     if (e.data === "connected") {
       //Do nothing
     } else {
-      var j = JSON.parse(e.data);
-      _.each(j, function(value, key) {
-        log(key+" = "+value);
-        tableData.push([key, value]);
-      })
+      if (_.isUndefined(e.data)) {
+        return false;
+      } else {
+        var j = JSON.parse(e.data);
+        _.each(j, function(value, key) {
+          log(key+" = "+value);
+          updateTable(key, value);
+          //tableData.push([key, value]);
+        })
+        return false;
+      }
     }
-    updateTable(tableData);
-    return false;
   };
   ws.onclose = function () {
     log('disconnected');
@@ -44,14 +48,19 @@ function send() {
   return false;
 }
 
-function updateTable(tableData) {
-  $('#loadbalancers').dataTable( { data: tableData, destroy: true } ); 
+function updateTable(k,v) {
+  // Check if there's an existing row
+  var tdid = k.split('/').slice(-1).pop()
+  console.log(k.split('/'));
+  if ($('td#'+tdid).length > 0) {
+    console.log("Updating existing row: "+k);
+    $('td#'+tdid).text(v);
+  } else {
+    $('#loadbalancers').append("<tr><td id="+tdid+">"+k+"</td><td>"+v+"</td></tr>");
+  }
 }
 
 function log(text) {
   console.log(text);
   return false;
 }
-$(document).ready(function() {
-  $('#loadbalancers').dataTable();
-});
