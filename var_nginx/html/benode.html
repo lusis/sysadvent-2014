@@ -66,8 +66,11 @@ label {
           </pre>
           </p>
           <p>The table below is updated in real time via websockets calling the <i>/lbws</i> location.</p>
+	  <p>If you only have one node listed, then you're starting with a blank slate/fresh install. You can click the button to populate the remaining 4 backends</p>
+	  <p>After that, if you refresh the page multiple times you'll get bounced between the multiple backends.</p>
         </div>
         <div class="lbtable">
+	<button onclick="addAdditionalNodes();">Add nodes</button>
         <table id='loadbalancers' class='table'>
           <thead>
             <tr>

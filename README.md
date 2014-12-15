@@ -26,22 +26,7 @@ There are two examples of websockets in the repo:
 To use the second kind of example, you'll need a modern browser that has native websocket support.
 
 ### Etcd examples
-To perform the etcd example (which also uses websockets), you'll need to have an external etcd instance to talk to (no authentication is supported). The makefile offers support for running an etcd container.
-If you want to use run etcd via the makefile, You'll your system's ip address as nginx will contact etcd at that ip address. localhost will not work in this case:
-```
-PUBLIC_IP="your local ip" make etcd
-```
+The container ships with a copy of etcd running as well. When the container starts up, it will populate one backend node in etcd. There will be a button for you to populate the remaining 4 nodes.
 
-Then you can run the openresty container in another window like so:
-```
-DOCKER_ENV="--env ETCD_URL="http://<ip from above>:5001"' make run
-```
-
-Once you load the etc example in the container, you will probably be faced with no data. There's another make command (`etcd_populate`) that will add a bunch of keys to etcd under the expected namespace. Alternately you can just run:
-
-```
-for i in `seq 10 30`;do curl -Ls -XPUT -d value="192.168.1.${i}:80${i}" http://etcdhost:etcdport/v2/keys/lbs/backends/node${i}; sleep 2; done
-```
-
-You should see the data start filling up the table in your browser as it is added.
+The reason for the fixed number of backends to populate is that each of these backends are actually the local nginx listening on multiple ports so the config files must be precreated.
 

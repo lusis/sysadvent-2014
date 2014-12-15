@@ -2,7 +2,15 @@ FROM debian:wheezy
 
 MAINTAINER John E Vincent <lusis.org+github.com@gmail.com>
 
+ENV 	DEBIAN_FRONTEND noninteractive
+ENV 	LANGUAGE en_US.UTF-8
+ENV 	LANG en_US.UTF-8
+ENV 	LC_ALL en_US.UTF-8
+
+
+
 RUN apt-get update && apt-get install -y \
+    supervisor \
     git \
     curl \
     build-essential \
@@ -20,6 +28,9 @@ RUN apt-get update && apt-get install -y \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
+RUN curl -L  https://github.com/coreos/etcd/releases/download/v0.4.6/etcd-v0.4.6-linux-amd64.tar.gz -o etcd-v0.4.6-linux-amd64.tar.gz && \
+    tar -zxvf etcd-v0.4.6-linux-amd64.tar.gz && \
+    cp etcd-v0.4.6-linux-amd64/etcd /
 
 RUN mkdir /build && \
     curl -LO http://openresty.org/download/ngx_openresty-1.7.7.1.tar.gz && \
@@ -90,5 +101,11 @@ RUN /usr/local/bin/luarocks install lua-resty-template && \
 RUN useradd -r -d /var/nginx nginx && chown -R nginx:nginx /var/nginx/ /tmp/client_body_tmp /tmp/proxy_temp
 
 EXPOSE 3131
-CMD /opt/openresty/nginx/sbin/nginx -c /var/nginx/nginx.conf
+EXPOSE 8001
+EXPOSE 5001
+
+ADD ./populate.sh /populate.sh
+ADD ./supervisord.conf /supervisord.conf
+CMD /usr/bin/supervisord -c /supervisord.conf
+#CMD /opt/openresty/nginx/sbin/nginx -c /var/nginx/nginx.conf
 #ENTRYPOINT ["sh", "-c", "/opt/openresty/nginx/sbin/nginx", "-c", "/var/nginx/nginx.conf"]
