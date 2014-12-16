@@ -92,6 +92,8 @@ In addition, because I know how difficult it can be to develop and troubleshoot 
 
 To use the basic examples in the container, you can simply clone the repo and run `make all`. This will build the container and then start OpenResty listening on port 3131 (and etcd on 5001 for one of the demos). The directory `var_nginx` will be mounted inside the container as `/var/nginx` and contains all the neccessary config files and lua code for you to poke/prod/experiment with. Logs will be written to `var_nginx/logs` so you can tail them if you'd like. As you can see it also uses Bootstrap for the UI so we've pretty much rounded out the ["what the hell have you built" graph.](https://twitter.com/codinghorror/status/347070841059692545)
 
+Please note that while the repo presents some neat tricks, the code inside is not optimized by any stretch. The etcd code especially may have some blocking implications but I've not yet confirmed that. The purpose is to teach and inspire more than "take it and run it in prod".
+
 ## Advanced examples
 If you'd like to work with the Slack examples, you'll need to generate a slack "bot" integration token for use. The Makefile includes support for running an etcd container appropriate for use with the tutorial container. If you aren't a Slack user then here's a screenshot so you can see what it WOULD look like:
 
@@ -100,3 +102,5 @@ If you'd like to work with the Slack examples, you'll need to generate a slack "
 # Wrap up
 Maybe this post has inspired you to at least take a look at OpenResty. Lua is a really neat language and very easy to pick up and add to your toolbelt. We use OpenResty builds of Nginx in many places internally from proxy servers to even powering our own internal SSO system based on Github Oauth and group memeberships.
 While most people simply use Nginx as a proxy and static content service, we treat it like an application server and leverage the flexibility of not requiring another microservice to handle certain tasks (in addition to using it as a proxy and static content service).
+
+The combination of Nginx and Lua won't replace all your use cases but by learning the system better, you can better leverage the use of Nginx across the board.
