@@ -19,7 +19,7 @@ Lua is a programming language invented in 1993. The title of this article is a s
 
 Lua is an interesting language. Anyone with experience in Ruby will likely find themselves picking it up very quickly. It has a very small core language, first-class functions and coroutines. It is dynamically typed and has one native data structure - the table. When you work in Lua, you will learn to love and appreciate the power of tables. They feel a lot like a ruby hash and are the foundation of most advanced Lua. 
 
-It has no classes but they can be implemented after a fashion using tables. Since Lua has first-class functions, you can create a "class" by lumping data and function into a table. There's no inheritence but instead you have prototypes. There's a bit of syntatic sugar to help you out when working with these objects. Inheritence is handled via the metatable.
+It has no classes but they can be implemented after a fashion using tables. Since Lua has first-class functions, you can create a "class" by lumping data and function into a table. There's no inheritence but instead you have prototypes (There's a bit of sugar to help you out when working with these 'objects' - _e.g calling `foo:somefunc()` to imply self as the first argument as opposed to `foo.somefunc(self)`_).
 
 For a good read on the language history
 - [Wikipedia](http://en.wikipedia.org/wiki/Lua_(programming_language))
@@ -27,33 +27,46 @@ For a good read on the language history
 
 For some basics on the language itself, the wikipedia article has code sample and also the [official documentation](http://www.lua.org/manual/5.2/). There is also a section on Lua in the newest edition of the Seven Languages series - [Seven More Languages in Seven Weeks](https://pragprog.com/book/7lang/seven-more-languages-in-seven-weeks)
 
+I've also written a couple of modules as well (primary for use with OpenResty):
+
+- [lua-httpclient](http://github.com/lusis/lua-httpclient)
+- [lua-github](https://github.com/lusis/lua-github)
+
+If you want to see an example of how the "classes" work with Lua, take a look at the github example and [compare the usage described in the README](https://github.com/lusis/lua-github#straight-lua) with the [module itself](https://github.com/lusis/lua-github/blob/master/src/github.lua#L45-L47).
+
 # Combining the two
-As I mentioned, Lua is an easily embeddable language. I've been unable to find a date on when Lua support was added to Nginx but it was a very early version.
+As I mentioned, Lua is an easily embeddable language. I've been unable to find a date on when Lua support was added to Nginx but it was a very early version (~ 0.5).
 
-One of the pain points of Nginx is that it doesn't support dynamically loaded modules. All extended functionality outside the core must be compiled in. Lua support in nginx made it so that you could add some advanced functionality to nginx via Lua that would normally require a C module and a recompile. Much of the nginx api itself is exposed to lua directly and Lua can be used at multiple places in the Nginx workflow. You can:
+One of the pain points of Nginx is that it doesn't support dynamically loaded modules. All extended functionality outside the core must be compiled in. Lua support in nginx made it so that you could add some advanced functionality to nginx via Lua that would normally require a C module and a recompile.
 
-- modify request or response headers via Lua
-- create rewrite rules via Lua.
-- create content itself via Lua. 
+Much of the Nginx api itself is exposed to Lua directly and Lua can be used at multiple places in the Nginx workflow. You can:
+
+- [modify request](http://wiki.nginx.org/HttpLuaModule#ngx.req.set_header) or [response headers](http://wiki.nginx.org/HttpLuaModule#ngx.header.HEADER) via Lua
+- [create rewrite rules via Lua](http://wiki.nginx.org/HttpLuaModule#rewrite_by_lua).
+- [create content itself via Lua](http://wiki.nginx.org/HttpLuaModule#content_by_lua). 
+- [dynamically set redirection and proxy backends](https://github.com/lusis/sysadvent-2014/blob/master/var_nginx/conf.d/sysadvent.conf#L97-L107)
+- [postprocess log events in a non-blocking fashion](http://wiki.nginx.org/HttpLuaModule#log_by_lua) (i.e. send directly to Logstash from Nginx)
 
 All of these are [documented](http://wiki.nginx.org/HttpLuaModule#Nginx_API_for_Lua) on the nginx website. 
+
 For example, if I wanted to have the response body be entirely created by lua, I could do the following in nginx:
 
 ```
-      location /foo {
-        content_by_lua '
-	ngx.header.content_type = 'text/plain'
-        local username = "bob"
-        ngx.say("hello ", username)
-        ngx.exit(ngx.HTTP_OK)
-        '
-      }
+location /foo {
+  content_by_lua '
+  ngx.header.content_type = 'text/plain'
+  local username = "bob"
+  ngx.say("hello ", username)
+  ngx.exit(ngx.HTTP_OK)
+  '
+}
 ```
 
-which would return `hello bob` as plain text to your browser when you requested `/foo` from nginx.
-Obviously escaping could get to be a headache here so most of the `*_by_lua` directives (which is for inlined lua code in the nginx config files) can be replaced with a `*_by_lua_file` where the lua code is stored in an external file.
+which would return `hello bob` as plain text to your browser when you requested `/foo` from Nginx.
 
-Some other neat tricks you have available are using the cosocket api where you can actually open arbitrary non-blocking network connections from lua inside an Nginx worker.
+Obviously escaping could get to be a headache here so most of the `*_by_lua` directives (which is for inlined Lua code in the Nginx config files) can be replaced with a `*_by_lua_file` where the Lua code is stored in an external file.
+
+Some other neat tricks you have available are using the cosocket api where you can actually open arbitrary non-blocking network connections via Lua from inside an Nginx worker.
 
 As you can see, this is pretty powerful. Additionally the Lua functionality is provided in nginx via a project called [LuaJIT](http://luajit.org/luajit.html) which offers amazing speed and predicatable usage. By default, lua code is cached in nginx but this can be disabled at run-time to help speed up the development process.
 
@@ -62,7 +75,7 @@ If it wasn't clear yet, the combination of nginx and lua basically gives you an 
 
 OpenResty combines checkpointed versions of Nginx, modified versions of the lua module (largely maintained by the OpenResty folks anyway), curated versions of LuaJIT and a boatload of nginx-specific lua modules into a single distribution. OpenResty builds of nginx can be used anywhere out-of-the-box that you would use a non-lua version of Nginx. Currently openresty is sponsored by CloudFlare where the primary author, Yichun Zhang (who prefers to go by "agentzh" everywhere) is employed.
 
-OpenResty is a pretty straightforward "configure/make/make install" beast. There is a slightly dated omnibus project on Github [from my friend Brian Akins](https://github.com/bakins/omnibus-nginx) that we've contributed to in the past and will be contributing our current changes back to in the future. Much of my appreciation and knowledge of lua and openresty comes directly from Brian and his omnibus packages are how I got started.
+OpenResty is a pretty straightforward "configure/make/make install" beast. There is a slightly dated omnibus project on Github [from my friend Brian Akins](https://github.com/bakins/omnibus-nginx) that we've contributed to in the past (and will be contributing our current changes back to in the future). Much of my appreciation and knowledge of lua and openresty comes directly from Brian and his omnibus packages are how I got started.
 
 # But nobody builds system packages anymore
 Obviously system packages are the domain of greyhaired BOFHs who think servers are for serving. Since we're all refined and there are buzzword quotas to be maintained, you should probably just use Docker (but you have to say it like Benny says "Spaceship").
@@ -77,12 +90,13 @@ In addition, because I know how difficult it can be to develop and troubleshoot 
 
 ![Nginx Lua Repl](repl.png)
 
-To use the basic examples in the container, you can simply clone the repo and run `make all`. This will build the container and then start OpenResty listening on port 3131. The directory `var_nginx` will be mounted inside the container as `/var/nginx` and contains all the neccessary config files and lua code for you to poke/prod/experiment with. Logs will be written to `var_nginx/logs` so you can tail them if you'd like. As you can see it also uses Bootstrap for the UI so we've pretty much rounded out the ["what the hell have you built" graph.](https://twitter.com/codinghorror/status/347070841059692545)
+To use the basic examples in the container, you can simply clone the repo and run `make all`. This will build the container and then start OpenResty listening on port 3131 (and etcd on 5001 for one of the demos). The directory `var_nginx` will be mounted inside the container as `/var/nginx` and contains all the neccessary config files and lua code for you to poke/prod/experiment with. Logs will be written to `var_nginx/logs` so you can tail them if you'd like. As you can see it also uses Bootstrap for the UI so we've pretty much rounded out the ["what the hell have you built" graph.](https://twitter.com/codinghorror/status/347070841059692545)
 
 ## Advanced examples
-If you'd like to work with the Slack or etcd examples, you'll need to generate a slack "bot" integration token for use or stand up an etcd instance respectively. The Makefile includes support for running an etcd container appropriate for use with the tutorial container. If you aren't a Slack user then here's a screenshot so you can see what it WOULD look like:
+If you'd like to work with the Slack examples, you'll need to generate a slack "bot" integration token for use. The Makefile includes support for running an etcd container appropriate for use with the tutorial container. If you aren't a Slack user then here's a screenshot so you can see what it WOULD look like:
 
 ![Slack WS Client](slack.png)
 
 # Wrap up
-Maybe this post has inspired you to at least take a look at OpenResty. Lua is a really neat language and very easy to pick up and add to your toolbelt. We use OpenResty builds of Nginx in many places internally from proxy servers to even powering our own internal SSO system based on Github Oauth and group memeberships. While most people simply use Nginx as a proxy and static content service, we treat it like an application server and leverage the flexibility of not requiring another microservice to handle certain tasks...in addition to using it as a proxy and static content service. This post and the accompanying code has been a blast to create and I hope it helps you in some small way.
+Maybe this post has inspired you to at least take a look at OpenResty. Lua is a really neat language and very easy to pick up and add to your toolbelt. We use OpenResty builds of Nginx in many places internally from proxy servers to even powering our own internal SSO system based on Github Oauth and group memeberships.
+While most people simply use Nginx as a proxy and static content service, we treat it like an application server and leverage the flexibility of not requiring another microservice to handle certain tasks (in addition to using it as a proxy and static content service).
