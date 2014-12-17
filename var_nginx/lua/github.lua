@@ -49,5 +49,10 @@ if username then
 end
 
 ngx.say("</div>")
+local codelink = [[
+<p><a href='#' onclick='getLuaCode("github.lua", "codesource"); return true;'>Code for this content</a></p>
+]]
+ngx.say(codelink)
+ngx.say("<pre class='prettyprint'><code id='codesource' class='lang-lua'></code></pre>")
 ngx.say(bootstrap_footer)
 ngx.exit(ngx.OK)
