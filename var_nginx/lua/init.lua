@@ -54,6 +54,7 @@ label {
         <div id="navbar" class="collapse navbar-collapse">
           <ul class="nav navbar-nav">
             <li><a href="/">Home</a></li>
+            <li><a href="/docs/index.md">Docs</a></li>
             <li><a href="https://github.com/lusis/sysadvent-2014">Github Repo for this project</a></li>
           </ul>
         </div><!--/.nav-collapse -->

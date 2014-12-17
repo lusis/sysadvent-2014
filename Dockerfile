@@ -82,7 +82,16 @@ RUN cd /build/ngx_openresty-1.7.7.1 && \
     cd / && \
     rm -rf /build && \
     ln -sf /opt/openresty/luajit/bin/luajit-2.1.0-alpha /opt/openresty/luajit/bin/lua 
-    
+
+# Hoedown needed for the resty-template markdown rendering
+RUN cd /tmp && \
+    git clone https://github.com/hoedown/hoedown.git && \
+    cd hoedown && \
+    make all install && \
+    cd / && \
+    rm -rf /tmp/hoedown && \
+    ldconfig
+
 # Now the luarocks stuff
 RUN curl -s http://luarocks.org/releases/luarocks-2.2.0.tar.gz | tar xvz -C /tmp/ \
  && cd /tmp/luarocks-* \
@@ -93,10 +102,12 @@ RUN curl -s http://luarocks.org/releases/luarocks-2.2.0.tar.gz | tar xvz -C /tmp
  && ln -sf /opt/openresty/luajit/bin/lua /usr/local/bin/lua \
  && rm -rf /tmp/luarocks-*
 
-RUN /usr/local/bin/luarocks install lua-resty-template && \
+RUN /usr/local/bin/luarocks install luasec && \
+  /usr/local/bin/luarocks install lua-resty-template && \
  /usr/local/bin/luarocks install httpclient && \
  /usr/local/bin/luarocks install lua-resty-http && \
- /usr/local/bin/luarocks install inspect
+ /usr/local/bin/luarocks install inspect && \
+ /usr/local/bin/luarocks install lua-resty-hoedown
 
 RUN useradd -r -d /var/nginx nginx && chown -R nginx:nginx /var/nginx/ /tmp/client_body_tmp /tmp/proxy_temp
 
