@@ -13,7 +13,9 @@ local function load_wrapper(s)
   if not file then return nil end
   local content = file:read("*a")
   file:close()
-  return bootstrap_header.."{*markdown([["..content.."]], {extensions = {'fenced_code', 'tables', 'quote'}, renderer = 'html', nesting = 2})*}"..bootstrap_footer
+  local prestyle = "<style>pre { background-color: black; color: grey; padding: 0px 5px 5px 5px;}</style>"
+  local toc = "{*markdown([["..content.."]], {extensions = {'fenced_code', 'tables', 'quote'}, renderer = 'html.toc', nesting = 2})*}"
+  return bootstrap_header..prestyle.."<div class='row'>".."{*markdown([["..content.."]], {extensions = {'fenced_code', 'tables', 'quote'}, renderer = 'html', nesting = 2})*}</div>"..bootstrap_footer
 end
 template.load = load_wrapper
 template.caching(false)

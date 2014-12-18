@@ -109,3 +109,4 @@ header_filter_by_lua '
 ```
 
 Note that `ngx.header.set_cookie` requires a table of strings (i.e. `{ cookie1, cookie2, cookie3 }`. Here we iterate through all the cookies we find (they will be automatically restricted to the domain we are using). It's also important to remember that lua does shallow copies, hence inserting into a new table.
+
