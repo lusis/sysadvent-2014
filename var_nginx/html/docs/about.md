@@ -19,5 +19,5 @@ location /docs {
 Lua source for `markdown.lua` is available [here](/code/lua/markdown.lua)
 
 ## About this project
-This project was created to accompany an entry in the SysAdvent series of posts for 2014. The [original post is here](https://sysadvent.blogspot.com/??????).
+This project was created to accompany an entry in the SysAdvent series of posts for 2014. The [original post is here](http://sysadvent.blogspot.com/2014/12/day-22-largely-unappreciated.html).
 It is intended to serve as a demonstration of the capabilities of the [OpenResty](http://openresty.org) build of [Nginx](http://nginx.org).
