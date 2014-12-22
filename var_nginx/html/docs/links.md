@@ -4,6 +4,7 @@ Here are some helpful links for learning more
 - [london lua presentation by @pintsized](http://www.londonlua.org/scripting_nginx_with_lua/)
 - [ngx_lua documentation](http://wiki.nginx.org/HttpLuaModule)
 - [OpenResty](http://openresty.org/)
+- [Lua: The world's most infuriating language](http://www.slideshare.net/jgrahamc/lua-the-worlds-most-infuriating-language)
 
 ## Code samples/repos
 
