@@ -93,7 +93,7 @@ RUN cd /tmp && \
     ldconfig
 
 # Now the luarocks stuff
-RUN curl -s http://luarocks.org/releases/luarocks-2.2.0.tar.gz | tar xvz -C /tmp/ \
+RUN curl -s -L http://luarocks.org/releases/luarocks-2.2.0.tar.gz | tar xvz -C /tmp/ \
  && cd /tmp/luarocks-* \
  && ./configure --with-lua=/opt/openresty/luajit \
     --with-lua-include=/opt/openresty/luajit/include/luajit-2.1 \
